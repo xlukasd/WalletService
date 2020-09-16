@@ -1,3 +1,4 @@
+using System.Net;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -37,7 +38,7 @@ namespace WalletServiceApi
 
             app.UseAuthorization();
 
-            app.UseWhen(context => context.Request.Method == System.Net.WebRequestMethods.Http.Get
+            app.UseWhen(context => context.Request.Method == WebRequestMethods.Http.Get
                                    && context.Request.RouteValues.TryGetValue("action", out object action)
                                    && (action as string) == nameof(WalletController.GetBalance),
                 appBuilder =>
@@ -45,7 +46,7 @@ namespace WalletServiceApi
                     appBuilder.UseMiddleware<BalanceCaching>();
                 });
 
-            app.UseWhen(context => context.Request.Method == System.Net.WebRequestMethods.Http.Post
+            app.UseWhen(context => context.Request.Method == WebRequestMethods.Http.Post
                                    && context.Request.RouteValues.TryGetValue("action", out object action)
                                    && (action as string) == nameof(WalletController.Transaction),
                 appBuilder =>

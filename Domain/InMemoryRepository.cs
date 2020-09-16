@@ -6,7 +6,7 @@ using Domain.Model;
 
 namespace Domain
 {
-    public class InMemoryRepository<TEntity> : IRepository<TEntity> where TEntity : Entity
+    internal class InMemoryRepository<TEntity> : IRepository<TEntity> where TEntity : Entity
     {
         private readonly HashSet<TEntity> _entities = new HashSet<TEntity>();
 

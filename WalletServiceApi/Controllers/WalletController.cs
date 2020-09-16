@@ -38,7 +38,7 @@ namespace WalletServiceApi.Controllers
                 return BadRequest("Player does not exist.");
             }
 
-            PlayerBalanceDto playerBalanceDto = new PlayerBalanceDto()
+            PlayerBalanceDto playerBalanceDto = new PlayerBalanceDto
             {
                 PlayerIdentifier = playerIdentifier,
                 Balance = player.Value.Wallet.GetBalance().Amount
