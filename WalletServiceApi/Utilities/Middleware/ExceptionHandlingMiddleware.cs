@@ -7,11 +7,11 @@ using Newtonsoft.Json;
 
 namespace WalletServiceApi.Utilities.Middleware
 {
-    public class ExceptionHandler
+    public class ExceptionHandlingMiddleware
     {
         private readonly RequestDelegate _next;
 
-        public ExceptionHandler(RequestDelegate next)
+        public ExceptionHandlingMiddleware(RequestDelegate next)
         {
             _next = next;
         }

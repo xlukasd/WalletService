@@ -1,5 +1,7 @@
+using System;
 using System.Net;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using WalletServiceApi.Controllers;
@@ -30,7 +32,7 @@ namespace WalletServiceApi
 
         public void Configure(IApplicationBuilder app)
         {
-            app.UseMiddleware<ExceptionHandler>();
+            app.UseMiddleware<ExceptionHandlingMiddleware>();
 
             app.UseHttpsRedirection();
 
@@ -38,26 +40,41 @@ namespace WalletServiceApi
 
             app.UseAuthorization();
 
-            app.UseWhen(context => context.Request.Method == WebRequestMethods.Http.Get
-                                   && context.Request.RouteValues.TryGetValue("action", out object action)
-                                   && (action as string) == nameof(WalletController.GetBalance),
-                appBuilder =>
-                {
-                    appBuilder.UseMiddleware<BalanceCaching>();
-                });
-
-            app.UseWhen(context => context.Request.Method == WebRequestMethods.Http.Post
-                                   && context.Request.RouteValues.TryGetValue("action", out object action)
-                                   && (action as string) == nameof(WalletController.Transaction),
-                appBuilder =>
-                {
-                    appBuilder.UseMiddleware<BalanceInvalidating>();
-                });
+            UseBalanceCacheInvalidatingMiddleware(app);
+            UseBalanceCachingMiddleware(app);
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
             });
+        }
+
+        private void UseBalanceCachingMiddleware(IApplicationBuilder app)
+        {
+            Func<HttpContext, bool> isGetBalanceRequestFunc = context =>
+                context.Request.Method == WebRequestMethods.Http.Get
+                && context.Request.RouteValues.TryGetValue("action", out object action)
+                && (action as string) == nameof(WalletController.GetBalance);
+
+            app.UseWhen(isGetBalanceRequestFunc,
+                appBuilder =>
+                {
+                    appBuilder.UseMiddleware<BalanceCachingMiddleware>();
+                });
+        }
+
+        private void UseBalanceCacheInvalidatingMiddleware(IApplicationBuilder app)
+        {
+            Func<HttpContext, bool> isNewTransactionRequestFunc = context =>
+                context.Request.Method == WebRequestMethods.Http.Post
+                && context.Request.RouteValues.TryGetValue("action", out object action)
+                && (action as string) == nameof(WalletController.Transaction);
+
+            app.UseWhen(isNewTransactionRequestFunc,
+                appBuilder =>
+                {
+                    appBuilder.UseMiddleware<BalanceCacheInvalidatingMiddleware>();
+                });
         }
     }
 }

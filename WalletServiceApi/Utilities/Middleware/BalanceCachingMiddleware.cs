@@ -11,12 +11,12 @@ using WalletServiceApi.Utilities.Middleware.Caching;
 
 namespace WalletServiceApi.Utilities.Middleware
 {
-    public class BalanceCaching
+    public class BalanceCachingMiddleware
     {
         private readonly IPlayerBalanceCache _playerBalanceCache;
         private readonly RequestDelegate _next;
 
-        public BalanceCaching(IPlayerBalanceCache playerBalanceCache, RequestDelegate next)
+        public BalanceCachingMiddleware(IPlayerBalanceCache playerBalanceCache, RequestDelegate next)
         {
             _playerBalanceCache = playerBalanceCache;
             _next = next;
