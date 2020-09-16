@@ -10,6 +10,8 @@ namespace Domain.TransactionPipeline
 {
     internal class OneTransactionPerPlayerChecker : IOneTransactionPerPlayerChecker
     {
+        private const int MaxNumberOfTransactionsPerPlayer = 1;
+
         private readonly ITransactionDomainLogicExecutor _transactionDomainLogicExecutor;
 
         private readonly ConcurrentDictionary<Guid, SemaphoreSlim> _transactionQueuePerPlayer = new ConcurrentDictionary<Guid, SemaphoreSlim>();
@@ -21,11 +23,11 @@ namespace Domain.TransactionPipeline
 
         public async Task<TransactionAttempt> ExecuteTransaction(Guid transactionIdentifier, Player player, Money money, CreditTransactionType creditTransactionType)
         {
-            _transactionQueuePerPlayer.TryAdd(player.Identifier, new SemaphoreSlim(1, 1));
+            _transactionQueuePerPlayer.TryAdd(player.Identifier, new SemaphoreSlim(MaxNumberOfTransactionsPerPlayer, MaxNumberOfTransactionsPerPlayer));
 
-            SemaphoreSlim semaphoreForTransactionProcessingForPlayer = _transactionQueuePerPlayer[player.Identifier];
+            SemaphoreSlim semaphoreForTransactionProcessingPerPlayer = _transactionQueuePerPlayer[player.Identifier];
 
-            await semaphoreForTransactionProcessingForPlayer.WaitAsync();
+            await semaphoreForTransactionProcessingPerPlayer.WaitAsync();
 
             try
             {
@@ -33,7 +35,7 @@ namespace Domain.TransactionPipeline
             }
             finally
             {
-                semaphoreForTransactionProcessingForPlayer.Release(1);
+                semaphoreForTransactionProcessingPerPlayer.Release(MaxNumberOfTransactionsPerPlayer);
             }
         }
     }

@@ -11,7 +11,7 @@ using WalletServiceApi.Utilities;
 
 namespace WalletServiceApi.Controllers
 {
-    [Route("[controller]")]
+    [Route("v1/[controller]")]
     [ApiController]
     public class WalletController : ControllerBase
     {
