@@ -20,11 +20,11 @@ namespace Domain.TransactionPipeline
 
         public async Task<Result<TransactionAttempt>> ExecuteTransaction(Guid transactionIdentifier, Player player, Money money, CreditTransactionType creditTransactionType)
         {
-            bool isFirstOccurenceOfTransaction = _transactionTasksByIdentifier.TryAdd(transactionIdentifier, new TaskCompletionSource<Result<TransactionAttempt>>());
+            bool transactionShouldBeProcessed = _transactionTasksByIdentifier.TryAdd(transactionIdentifier, new TaskCompletionSource<Result<TransactionAttempt>>());
 
             TaskCompletionSource<Result<TransactionAttempt>> transactionInProgress = _transactionTasksByIdentifier[transactionIdentifier];
 
-            if (!isFirstOccurenceOfTransaction)
+            if (!transactionShouldBeProcessed)
             {
                 return await transactionInProgress.Task;
             }

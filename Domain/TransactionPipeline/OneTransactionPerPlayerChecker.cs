@@ -23,9 +23,9 @@ namespace Domain.TransactionPipeline
         {
             _transactionQueuePerPlayer.TryAdd(player.Identifier, new SemaphoreSlim(1, 1));
 
-            SemaphoreSlim previousTransactionProcessedForPlayer = _transactionQueuePerPlayer[player.Identifier];
+            SemaphoreSlim semaphoreForTransactionProcessingForPlayer = _transactionQueuePerPlayer[player.Identifier];
 
-            await previousTransactionProcessedForPlayer.WaitAsync();
+            await semaphoreForTransactionProcessingForPlayer.WaitAsync();
 
             try
             {
@@ -33,7 +33,7 @@ namespace Domain.TransactionPipeline
             }
             finally
             {
-                previousTransactionProcessedForPlayer.Release(1);
+                semaphoreForTransactionProcessingForPlayer.Release(1);
             }
         }
     }
