@@ -26,14 +26,14 @@ namespace Domain.Model.Entities
 
             Money balanceAfterMovement = new Transaction(money, creditTransactionType).GetBalanceAfterPerformed(currentBalance);
 
-            return balanceAfterMovement.Amount > 0;
+            return balanceAfterMovement.Amount >= 0;
         }
 
         public void MakeMovement(Money money, CreditTransactionType creditTransactionType)
         {
             if (!IsMovementPossible(money, creditTransactionType))
             {
-                throw new NegativeBalanceReachedException();
+                throw new NegativeBalanceReachedException("Balance would be negative after this transaction.");
             }
 
             _executedTransactions.Add(new ExecutedTransaction(money, creditTransactionType));
