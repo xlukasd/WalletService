@@ -35,7 +35,7 @@ namespace Domain.TransactionPipeline
             }
             finally
             {
-                semaphoreForTransactionProcessingPerPlayer.Release(MaxNumberOfTransactionsPerPlayer);
+                semaphoreForTransactionProcessingPerPlayer.Release();
             }
         }
     }
